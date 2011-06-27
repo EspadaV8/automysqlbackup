@@ -261,28 +261,6 @@ LOGERR=${BACKUPDIR}/ERRORS_${DBHOST}-`${DATEC} +%N`.log		# Logfile Name
 BACKUPFILES=""
 OPT="--quote-names --opt"			# OPT string for use with mysqldump ( see man mysqldump )
 
-# IO redirection for logging.
-touch ${LOGFILE}
-exec 6>&1           # Link file descriptor #6 with stdout.
-                    # Saves stdout.
-exec > ${LOGFILE}     # stdout replaced with file ${LOGFILE}.
-touch ${LOGERR}
-exec 7>&2           # Link file descriptor #7 with stderr.
-                    # Saves stderr.
-exec 2> ${LOGERR}     # stderr replaced with file ${LOGERR}.
-
-# Add --compress mysqldump option to ${OPT}
-if [ "${COMMCOMP}" = "yes" ];
-	then
-		OPT="${OPT} --compress"
-	fi
-
-# Add --max_allowed_packet=... mysqldump option to ${OPT}
-if [ "${MAX_ALLOWED_PACKET}" ];
-	then
-		OPT="${OPT} --max_allowed_packet=${MAX_ALLOWED_PACKET}"
-	fi
-
 # Create required directories
 if [ ! -e "${BACKUPDIR}" ]		# Check Backup Directory exists.
 	then
@@ -313,6 +291,30 @@ then
 eval ${RM} -fv "${BACKUPDIR}/latest/*"
 fi
 
+
+
+# IO redirection for logging.
+touch ${LOGFILE}
+exec 6>&1           # Link file descriptor #6 with stdout.
+                    # Saves stdout.
+exec > ${LOGFILE}     # stdout replaced with file ${LOGFILE}.
+touch ${LOGERR}
+exec 7>&2           # Link file descriptor #7 with stderr.
+                    # Saves stderr.
+exec 2> ${LOGERR}     # stderr replaced with file ${LOGERR}.
+
+
+# Add --compress mysqldump option to ${OPT}
+if [ "${COMMCOMP}" = "yes" ];
+	then
+		OPT="${OPT} --compress"
+	fi
+
+# Add --max_allowed_packet=... mysqldump option to ${OPT}
+if [ "${MAX_ALLOWED_PACKET}" ];
+	then
+		OPT="${OPT} --max_allowed_packet=${MAX_ALLOWED_PACKET}"
+	fi
 
 # Functions
 
