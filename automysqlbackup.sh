@@ -208,6 +208,7 @@ fi
 #
 # Full pathname to binaries to avoid problems with aliases and builtins etc.
 #
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/mysql/bin
 WHICH="`which which`"
 AWK="`${WHICH} gawk`"
 LOGGER="`${WHICH} logger`"
@@ -248,7 +249,6 @@ function get_debian_pw() {
 
 export LC_ALL=C
 PROGNAME=`${BASENAME} $0`
-PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/mysql/bin 
 DATE=`${DATEC} +%Y-%m-%d_%Hh%Mm`				# Datestamp e.g 2002-09-21
 DOW=`${DATEC} +%A`							# Day of the week e.g. Monday
 DNOW=`${DATEC} +%u`						# Day number of the week 1 to 7 where 1 represents Monday
