@@ -24,196 +24,28 @@
 # (Detailed instructions below variables)
 #=====================================================================
 #set -x
-CONFIGFILE="/etc/automysqlbackup/automysqlbackup.conf"
+
+while getopts "c:" optname
+do
+	case "$optname" in
+		"c")
+			CONFIGFILE="$OPTARG"
+			;;
+	esac
+done
+
+if [ -z "$CONFIGFILE" ]; then
+	CONFIGFILE="/etc/automysqlbackup/automysqlbackup.conf"
+fi
 
 if [ -r ${CONFIGFILE} ]; then
 	# Read the configfile if it's existing and readable
 	source ${CONFIGFILE}
 else
-	# do inline-config otherwise
-	# To create a configfile just copy the code between "### START CFG ###" and "### END CFG ###"
-	# to /etc/automysqlbackup/automysqlbackup.conf. After that you're able to upgrade this script
-	# (copy a new version to its location) without the need for editing it.
-	### START CFG ###
-	# Username to access the MySQL server e.g. dbuser
-	USERNAME=debian
-	
-	# Password to access the MySQL server e.g. password
-	PASSWORD=
-	
-	# Host name (or IP address) of MySQL server e.g localhost
-	DBHOST=localhost
-	
-	# List of DBNAMES for Daily/Weekly Backup e.g. "DB1 DB2 DB3"
-	DBNAMES="all"
-	
-	# Backup directory location e.g /backups
-	BACKUPDIR="/srv/backup/db"
-	
-	# Mail setup
-	# What would you like to be mailed to you?
-	# - log   : send only log file
-	# - files : send log file and sql files as attachments (see docs)
-	# - stdout : will simply output the log to the screen if run manually.
-	# - quiet : Only send logs if an error occurs to the MAILADDR.
-	MAILCONTENT="log"
-	
-	# Set the maximum allowed email size in k. (4000 = approx 5MB email [see docs])
-	MAXATTSIZE="4000"
-	
-	# Email Address to send mail to? (user@domain.com)
-	MAILADDR="maintenance@example.com"
-	
-	
-	# ============================================================
-	# === ADVANCED OPTIONS ( Read the doc's below for details )===
-	#=============================================================
-	
-	# List of DBBNAMES for Monthly Backups.
-	MDBNAMES="${DBNAMES}"
-	
-	# List of DBNAMES to EXLUCDE if DBNAMES are set to all (must be in " quotes)
-	DBEXCLUDE=""
-	
-	# Include CREATE DATABASE in backup?
-	CREATE_DATABASE=no
-	
-	# Separate backup directory and file for each DB? (yes or no)
-	SEPDIR=yes
-	
-	# Which day do you want weekly backups? (1 to 7 where 1 is Monday)
-	DOWEEKLY=6
-	
-	# Choose Compression type. (gzip or bzip2)
-	COMP=gzip
-	
-	# Compress communications between backup server and MySQL server?
-	COMMCOMP=no
-	
-	# Additionally keep a copy of the most recent backup in a seperate directory.
-	LATEST=no
-	
-	#  The maximum size of the buffer for client/server communication. e.g. 16MB (maximum is 1GB)
-	MAX_ALLOWED_PACKET=
-	
-	#  For connections to localhost. Sometimes the Unix socket file must be specified.
-	SOCKET=
-	
-	# Command to run before backups (uncomment to use)
-	#PREBACKUP="/etc/mysql-backup-pre"
-	
-	# Command run after backups (uncomment to use)
-	#POSTBACKUP="/etc/mysql-backup-post"
-	### END CFG ###
+	echo "No config file found, please pass one to the command."
+	exit
 fi
 
-#=====================================================================
-# Options documantation
-#=====================================================================
-# Set USERNAME and PASSWORD of a user that has the appropriate permissions
-# to backup ALL databases. (See mysql documentation for details)
-# NEW in 2.5.1:
-# - If USERNAME is set to "debian" and PASSWORD is unset or "" obtain
-#   them from the file /etc/mysql/debian.cnf
-# - First command line option "-c" for configfile
-# - Interpretable Exit-States:
-#    1: given configfile is not readable or does not exist
-#    2: unknown option
-#
-# Set the DBHOST option to the server you wish to backup, leave the
-# default to backup "this server".(to backup multiple servers make
-# copies of this file and set the options for that server)
-#
-# Put in the list of DBNAMES(Databases)to be backed up. If you would like
-# to backup ALL DBs on the server set DBNAMES="all".(if set to "all" then
-# any new DBs will automatically be backed up without needing to modify
-# this backup script when a new DB is created).
-#
-# If the DB you want to backup has a space in the name replace the space
-# with a % e.g. "data base" will become "data%base"
-# NOTE: Spaces in DB names may not work correctly when SEPDIR=no.
-#
-# You can change the backup storage location from /backups to anything
-# you like by using the BACKUPDIR setting..
-#
-# The MAILCONTENT and MAILADDR options and pretty self explanitory, use
-# these to have the backup log mailed to you at any email address or multiple
-# email addresses in a space seperated list.
-# (If you set mail content to "log" you will require access to the "mail" program
-# on your server. If you set this to "files" you will have to have mutt installed
-# on your server. If you set it to "stdout" it will log to the screen if run from 
-# the console or to the cron job owner if run through cron. If you set it to "quiet"
-# logs will only be mailed if there are errors reported. )
-#
-# MAXATTSIZE sets the largest allowed email attachments total (all backup files) you
-# want the script to send. This is the size before it is encoded to be sent as an email
-# so if your mail server will allow a maximum mail size of 5MB I would suggest setting
-# MAXATTSIZE to be 25% smaller than that so a setting of 4000 would probably be fine.
-#
-# Finally copy automysqlbackup.sh to anywhere on your server and make sure
-# to set executable permission. You can also copy the script to
-# /etc/cron.daily to have it execute automatically every night or simply
-# place a symlink in /etc/cron.daily to the file if you wish to keep it 
-# somwhere else.
-# NOTE:On Debian copy the file with no extention for it to be run
-# by cron e.g just name the file "automysqlbackup"
-#
-# Thats it..
-#
-#
-# === Advanced options doc's ===
-#
-# The list of MDBNAMES is the DB's to be backed up only monthly. You should
-# always include "mysql" in this list to backup your user/password
-# information along with any other DBs that you only feel need to
-# be backed up monthly. (if using a hosted server then you should
-# probably remove "mysql" as your provider will be backing this up)
-# NOTE: If DBNAMES="all" then MDBNAMES has no effect as all DBs will be backed
-# up anyway.
-#
-# If you set DBNAMES="all" you can configure the option DBEXCLUDE. Other
-# wise this option will not be used.
-# This option can be used if you want to backup all dbs, but you want 
-# exclude some of them. (eg. a db is to big).
-#
-# Set CREATE_DATABASE to "yes" (the default) if you want your SQL-Dump to create
-# a database with the same name as the original database when restoring.
-# Saying "no" here will allow your to specify the database name you want to
-# restore your dump into, making a copy of the database by using the dump
-# created with automysqlbackup.
-# NOTE: Not used if SEPDIR=no
-#
-# The SEPDIR option allows you to choose to have all DBs backed up to
-# a single file (fast restore of entire server in case of crash) or to
-# seperate directories for each DB (each DB can be restored seperately
-# in case of single DB corruption or loss).
-#
-# To set the day of the week that you would like the weekly backup to happen
-# set the DOWEEKLY setting, this can be a value from 1 to 7 where 1 is Monday,
-# The default is 6 which means that weekly backups are done on a Saturday.
-#
-# COMP is used to choose the copmression used, options are gzip or bzip2.
-# bzip2 will produce slightly smaller files but is more processor intensive so
-# may take longer to complete.
-#
-# COMMCOMP is used to enable or diable mysql client to server compression, so
-# it is useful to save bandwidth when backing up a remote MySQL server over
-# the network. 
-#
-# LATEST is to store an additional copy of the latest backup to a standard
-# location so it can be downloaded bt thrid party scripts.
-#
-# If the DB's being backed up make use of large BLOB fields then you may need
-# to increase the MAX_ALLOWED_PACKET setting, for example 16MB..
-#
-# When connecting to localhost as the DB server (DBHOST=localhost) sometimes
-# the system can have issues locating the socket file.. This can now be set
-# using the SOCKET parameter.. An example may be SOCKET=/private/tmp/mysql.sock
-#
-# Use PREBACKUP and POSTBACKUP to specify Per and Post backup commands
-# or scripts to perform tasks either before or after the backup process.
-#
-#
 #=====================================================================
 # Backup Rotation..
 #=====================================================================
@@ -413,24 +245,6 @@ function get_debian_pw() {
 }
 
 [ "x${USERNAME}" = "xdebian" -a "x${PASSWORD}" = "x" ] && get_debian_pw 
-
-while [ $# -gt 0 ]; do
-	case $1 in
-		-c)
-			if [ -r "$2" ]; then
-				source "$2"
-				shift 2
-			else
-				${ECHO} "Ureadable config file \"$2\""
-				exit 1
-			fi
-			;;
-		*)
-			${ECHO} "Unknown Option \"$1\""
-			exit 2
-			;;
-	esac
-done
 
 export LC_ALL=C
 PROGNAME=`${BASENAME} $0`
