@@ -353,7 +353,7 @@ if [ "${PREBACKUP}" ]
 	${ECHO} ======================================================================
 	${ECHO} "Prebackup command output."
 	${ECHO}
-	eval ${PREBACKUP}
+	source ${PREBACKUP}
 	${ECHO}
 	${ECHO} ======================================================================
 	${ECHO}
@@ -534,7 +534,7 @@ if [ "${POSTBACKUP}" ]
 	${ECHO} ======================================================================
 	${ECHO} "Postbackup command output."
 	${ECHO}
-	eval ${POSTBACKUP}
+	source ${POSTBACKUP}
 	${ECHO}
 	${ECHO} ======================================================================
 fi
