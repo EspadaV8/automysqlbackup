@@ -399,9 +399,9 @@ ${ECHO} Backup of Database Server - ${HOST}
 ${ECHO} ======================================================================
 
 # Test is seperate DB backups are required
-if [ "${SEPDIR}" = "yes" ]; then
 ${ECHO} Backup Start Time `${DATEC}`
 ${ECHO} ======================================================================
+if [ "${SEPDIR}" = "yes" ]; then
 	# Monthly Full Backup of all Databases
 	if [ ${DOM} = "01" ]; then
 		for MDB in ${MDBNAMES}
@@ -469,13 +469,9 @@ ${ECHO} ======================================================================
 		${ECHO} ----------------------------------------------------------------------
 	fi
 	done
-${ECHO} Backup End `${DATEC}`
-${ECHO} ======================================================================
 
 
 else # One backup file for all DBs
-${ECHO} Backup Start `${DATEC}`
-${ECHO} ======================================================================
 	# Monthly Full Backup of all Databases
 	if [ ${DOM} = "01" ]; then
 		${ECHO} Monthly full Backup of \( ${MDBNAMES} \)...
@@ -517,9 +513,10 @@ ${ECHO} ======================================================================
 			BACKUPFILES="${BACKUPFILES} ${BACKUPDIR}/daily/${DATE}.${DOW}.sql${SUFFIX}"
 		${ECHO} ----------------------------------------------------------------------
 	fi
-${ECHO} Backup End Time `${DATEC}`
-${ECHO} ======================================================================
 fi
+
+${ECHO} Backup End `${DATEC}`
+${ECHO} ======================================================================
 ${ECHO} Total disk space used for backup storage..
 ${ECHO} Size - Location
 ${ECHO} `${DU} -hs "${BACKUPDIR}"`
