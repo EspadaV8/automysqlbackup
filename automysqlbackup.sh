@@ -256,8 +256,8 @@ DOM=`${DATEC} +%d`							# Date of the Month e.g. 27
 M=`${DATEC} +%B`							# Month e.g January
 W=`${DATEC} +%V`							# Week Number e.g 37
 VER=2.5.1									# Version Number
-LOGFILE=${BACKUPDIR}/${DBHOST}-`${DATEC} +%N`.log		# Logfile Name
-LOGERR=${BACKUPDIR}/ERRORS_${DBHOST}-`${DATEC} +%N`.log		# Logfile Name
+LOGFILE=${BACKUPDIR}/${DBHOST}-`${DATEC} +%S`.log		# Logfile Name
+LOGERR=${BACKUPDIR}/ERRORS_${DBHOST}-`${DATEC} +%S`.log		# Logfile Name
 BACKUPFILES=""
 OPT="--quote-names --opt"			# OPT string for use with mysqldump ( see man mysqldump )
 
