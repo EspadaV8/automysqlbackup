@@ -320,7 +320,7 @@ if [ "${MAX_ALLOWED_PACKET}" ];
 
 # Database dump function
 dbdump () {
-${MYSQLDUMP} --user=${USERNAME} --password=${PASSWORD} --host=${DBHOST} ${OPT} ${1} > ${2}
+${MYSQLDUMP} --user=${USERNAME} --host=${DBHOST} ${OPT} ${1} > ${2}
 return $?
 }
 
@@ -378,6 +378,10 @@ if [ "${DBHOST}" = "localhost" ]; then
 	fi
 else
 	HOST=${DBHOST}
+fi
+
+if [ ! -z "${PASSWORD}" ]; then
+	OPT="${OPT} --password=${PASSWORD}"
 fi
 
 # If backing up all DBs on the server
