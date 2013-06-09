@@ -319,7 +319,7 @@ if [ "${EVENTS}" = "yes" ];
 	fi
 
 # Add --max_allowed_packet=... mysqldump option to ${OPT}
-if [ "${MAX_ALLOWED_PACKET}" ]
+if [ "${MAX_ALLOWED_PACKET}" ];
 	then
 		OPT="${OPT} --max_allowed_packet=${MAX_ALLOWED_PACKET}"
 	fi
