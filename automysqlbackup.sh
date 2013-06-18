@@ -94,6 +94,8 @@ fi
 # Change Log
 #=====================================================================
 #
+# VER 2.5.1-02 - (2013-06-09)
+#     - Added support for events option (by Jack-Benny Persson)
 # VER 2.5.1-01 - (2010-07-06)
 #     - Fixed pathname bug item #3025849 (by Johannes Kolter)
 # VER 2.5.1 - (2010-07-04)
@@ -308,6 +310,12 @@ exec 2> ${LOGERR}     # stderr replaced with file ${LOGERR}.
 if [ "${COMMCOMP}" = "yes" ];
 	then
 		OPT="${OPT} --compress"
+	fi
+
+# Add --events mysqldump option to ${OPT}
+if [ "${EVENTS}" = "yes" ];
+	then
+		OPT="${OPT} --events"
 	fi
 
 # Add --max_allowed_packet=... mysqldump option to ${OPT}
